@@ -158,6 +158,7 @@ class LibrbdFio(Benchmark):
             fio_cmd += ' --log_avg_msec=%s' % self.log_avg_msec
         if self.log_hist_msec is not None:
             fio_cmd += ' --log_hist_msec=%s' % self.log_hist_msec
+            fio_cmd += ' --write_hist_log=%s' % out_file
         if self.rate_iops is not None:
             fio_cmd += ' --rate_iops=%s' % self.rate_iops
 
