@@ -483,7 +483,7 @@ class Ceph(Cluster):
         prefill_time = profile.get('prefill_time', 0)
 
 #        common.pdsh(settings.getnodes('head'), 'sudo ceph -c %s osd pool delete %s %s --yes-i-really-really-mean-it' % (self.tmp_conf, name, name)).communicate()
-        common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool create %s %d %d %s' % (self.ceph_cmd, self.tmp_conf, name, pg_size, pgp_size, erasure_profile)).communicate()
+        #common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool create %s %d %d %s' % (self.ceph_cmd, self.tmp_conf, name, pg_size, pgp_size, erasure_profile)).communicate()
 
         if replication and replication == 'erasure':
             common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool create %s %d %d erasure %s' % (self.ceph_cmd, self.tmp_conf, name, pg_size, pgp_size, erasure_profile)).communicate()
@@ -492,8 +492,10 @@ class Ceph(Cluster):
 
         if replication and replication.isdigit():
             pool_repl_size = int(replication)
+            pool_repl_min_size = pool_repl_size - 1
+            if pool_repl_size == 1: pool_repl_min_size = 1
             common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s size %s' % (self.ceph_cmd, self.tmp_conf, name, replication)).communicate()
-            common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s min_size %d' % (self.ceph_cmd, self.tmp_conf, name, pool_repl_size-1)).communicate()
+            common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s min_size %d' % (self.ceph_cmd, self.tmp_conf, name, pool_repl_min_size)).communicate()
 
         if crush_profile:
             try:
