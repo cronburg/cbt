@@ -40,6 +40,10 @@ def main(argv):
     ctx = parse_args(argv)
     settings.initialize(ctx)
 
+    #c = settings.cluster
+    #keys = [c['head']] + c['clients'] + c['osds']
+    #setup_loggers(keywords=keys)
+
     iteration = 0
     logger.debug("Settings.cluster:\n    %s",
                  pprint.pformat(settings.cluster).replace("\n", "\n    "))

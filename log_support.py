@@ -1,6 +1,7 @@
 import logging
 import os
 import yaml
+import re
 
 has_a_tty = os.isatty(1) # test stdout
 
@@ -31,12 +32,13 @@ class ColoredFormatter(logging.Formatter):
         'DEBUG': color_me(BLUE),
         'CRITICAL': color_me(RED),
         'ERROR': color_me(RED),
-        'INFO': color_me(GREEN)
+        'INFO': color_me(GREEN),
     }
 
-    def __init__(self, msg, use_color=True, datefmt=None):
+    def __init__(self, msg, use_color=True, datefmt=None, keywords=[]):
         logging.Formatter.__init__(self, msg, datefmt=datefmt)
         self.use_color = use_color
+        self.keywords = keywords
 
     def format(self, record):
         orig = record.__dict__
@@ -58,14 +60,14 @@ class ColoredFormatter(logging.Formatter):
         return res
 
 
-def setup_loggers(def_level=logging.DEBUG, log_fname=None):
+def setup_loggers(def_level=logging.DEBUG, log_fname=None, keywords=[]):
     logger = logging.getLogger('cbt')
     logger.setLevel(logging.DEBUG)
     sh = logging.StreamHandler()
     sh.setLevel(def_level)
 
     log_format = '%(asctime)s - %(levelname)s - %(name)-8s - %(message)s'
-    colored_formatter = ColoredFormatter(log_format, datefmt="%H:%M:%S")
+    colored_formatter = ColoredFormatter(log_format, datefmt="%H:%M:%S", keywords=keywords)
 
     sh.setFormatter(colored_formatter)
     logger.addHandler(sh)
