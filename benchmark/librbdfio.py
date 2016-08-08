@@ -66,9 +66,9 @@ class LibrbdFio(Benchmark):
         self.cluster.check_scrub()
         monitoring.stop()
 
-        logger.info('Pausing for 60s for idle monitoring.')
+        logger.info('Pausing for 5s for idle monitoring.')
         monitoring.start("%s/idle_monitoring" % self.run_dir)
-        time.sleep(60)
+        time.sleep(5)
         monitoring.stop()
 
         common.sync_files('%s/*' % self.run_dir, self.out_dir)
@@ -83,7 +83,7 @@ class LibrbdFio(Benchmark):
         logger.info('Attempting to populating fio files...')
         if (self.use_existing_volumes == False):
           for i in xrange(self.volumes_per_client):
-              pre_cmd = 'sudo %s --ioengine=rbd --clientname=admin --pool=%s --rbdname=cbt-librbdfio-`hostname -s`-%d --invalidate=0  --rw=write --numjobs=%s --bs=4M --size %dM %s > /dev/null' % (self.cmd_path, self.poolname, i, self.numjobs, self.vol_size, self.names)
+              pre_cmd = 'sudo %s --ioengine=rbd --clientname=admin --pool=%s --rbdname=cbt-librbdfio-`hostname -s`-%d --invalidate=0  --rw=write --numjobs=%s --bs=4M --size %dM %s > /tmp/FIO.OUT' % (self.cmd_path, self.poolname, i, self.numjobs, self.vol_size, self.names)
               p = common.pdsh(settings.getnodes('clients'), pre_cmd)
               ps.append(p)
           for p in ps:
@@ -146,9 +146,10 @@ class LibrbdFio(Benchmark):
         fio_cmd += ' --end_fsync=%s' % self.end_fsync
 #        if self.vol_size:
 #            fio_cmd += ' -- size=%dM' % self.vol_size
-        #fio_cmd += ' --write_iops_log=%s' % out_file
-        #fio_cmd += ' --write_bw_log=%s' % out_file
-        #fio_cmd += ' --write_lat_log=%s' % out_file
+        if not self.log_hist_msec:
+            fio_cmd += ' --write_iops_log=%s' % out_file
+            fio_cmd += ' --write_bw_log=%s' % out_file
+            fio_cmd += ' --write_lat_log=%s' % out_file
         if 'recovery_test' in self.cluster.config:
             fio_cmd += ' --time_based'
         if self.random_distribution is not None:
@@ -156,8 +157,8 @@ class LibrbdFio(Benchmark):
         if self.log_avg_msec is not None:
             fio_cmd += ' --log_avg_msec=%s' % self.log_avg_msec
         if self.log_hist_msec is not None:
-            fio_cmd += ' --write_hist_log=%s' % out_file
             fio_cmd += ' --log_hist_msec=%s' % self.log_hist_msec
+            fio_cmd += ' --write_hist_log=%s' % out_file
         if self.rate_iops is not None:
             fio_cmd += ' --rate_iops=%s' % self.rate_iops
 
