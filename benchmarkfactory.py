@@ -3,6 +3,7 @@ import itertools
 
 import settings
 from benchmark.radosbench import Radosbench
+from benchmark.fio import Fio
 from benchmark.rbdfio import RbdFio
 from benchmark.kvmrbdfio import KvmRbdFio
 from benchmark.librbdfio import LibrbdFio
@@ -49,6 +50,8 @@ def get_object(cluster, benchmark, bconfig):
         return Nullbench(cluster, bconfig)
     if benchmark == "radosbench":
         return Radosbench(cluster, bconfig)
+    if benchmark == "fio":
+        return Fio(cluster, bconfig)
     if benchmark == "rbdfio":
         return RbdFio(cluster, bconfig)
     if benchmark == "kvmrbdfio":
