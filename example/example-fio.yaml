@@ -1,0 +1,55 @@
+cluster:
+  clusterid: "ceph"
+  use_existing: True
+  head: "root@gprfc073-10ge"
+  clients: ["root@gprfc073-10ge"]
+  osds:    ["root@gprfc073-10ge", "root@gprfc074-10ge", "root@gprfc075-10ge", "root@gprfc076-10ge"]
+  mons: ["root@gprfc073-10ge"]
+  osds_per_node: 1
+#  fs: xfs
+#  mkfs_opts: -f -i size=2048
+#  mount_opts: -o inode64,noatime,logbsize=256k
+  conf_file: /etc/ceph/ceph.conf
+  ceph.conf: /etc/ceph/ceph.conf
+  iterations: 1
+  rebuild_every_test: False
+  tmp_dir: "/tmp/cbt-librbdfio"
+  osd_ra: 4096
+  pool_profiles:
+    replicated:
+      size: 3 # number of replicas
+      min_size: 2
+      # pg = placement groups
+      pg_size: 8192
+      replication: 2
+    fio-pool:
+      pg_size: 256
+      pgp_size: 256
+      replication: 2
+benchmarks:
+  fio:
+    cmd_path: '/root/fio.axboe-histograms/fio'
+    poolname: 'cbt-librbdfio'
+    idle_sleep: 0 # sleep for 60 seconds for idle monitoring
+    global:
+      runtime: 30
+      numjobs: 8
+      size: 2048
+      rwmixread: 50
+      log_hist_msec: 2000
+    
+    mode: ['read', 'write']
+    op_size: [131072]
+    procs_per_volume: [1] 
+    volumes_per_client: [1] 
+    iodepth: [32]
+    osd_ra: [4096]
+# radosbench:
+#   op_size: [ 4194304, 524288, 4096 ]
+#   write_only: False
+#   time: 30
+#   concurrent_ops: [ 128 ]
+#   concurrent_procs: 1
+#   use_existing: True
+#   pool_profile: replicated
+#
